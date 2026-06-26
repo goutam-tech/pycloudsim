@@ -1,0 +1,42 @@
+[
+  {
+    "id": 0,
+    "mips": 20000,
+    "pes": 2,
+    "ram": 4096,
+    "bandwidth": 1000,
+    "storage": 50000
+  },
+  {
+    "id": 1,
+    "mips": 30000,
+    "pes": 4,
+    "ram": 8192,
+    "bandwidth": 2000,
+    "storage": 80000
+  },
+  {
+    "id": 2,
+    "mips": 15000,
+    "pes": 1,
+    "ram": 2048,
+    "bandwidth": 500,
+    "storage": 20000
+  },
+  {
+    "id": 3,
+    "mips": 25000,
+    "pes": 2,
+    "ram": 4096,
+    "bandwidth": 1000,
+    "storage": 40000
+  },
+  {
+    "id": 4,
+    "mips": 40000,
+    "pes": 4,
+    "ram": 16384,
+    "bandwidth": 4000,
+    "storage": 100000
+  }
+]
