@@ -1,0 +1,22 @@
+[
+  {
+    "id": 0,
+    "mips": 100000,
+    "pes": 8,
+    "ram": 65536,
+    "bandwidth": 10000,
+    "storage": 1000000,
+    "idle_power": 100,
+    "max_power": 250
+  },
+  {
+    "id": 1,
+    "mips": 80000,
+    "pes": 4,
+    "ram": 32768,
+    "bandwidth": 10000,
+    "storage": 500000,
+    "idle_power": 80,
+    "max_power": 200
+  }
+]
