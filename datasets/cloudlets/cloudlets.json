@@ -43,5 +43,32 @@
     "output_size": 350,
     "arrival_time": 0,
     "priority": 1
+  },
+  {
+    "id": 6,
+    "length": 40000,
+    "pes": 2,
+    "file_size": 300,
+    "output_size": 300,
+    "arrival_time": 5.5,
+    "priority": 0
+  },
+  {
+    "id": 7,
+    "length": 25000,
+    "pes": 1,
+    "file_size": 200,
+    "output_size": 200,
+    "arrival_time": 3.1,
+    "priority": 1
+  },
+  {
+    "id": 8,
+    "length": 60000,
+    "pes": 4,
+    "file_size": 400,
+    "output_size": 350,
+    "arrival_time": 2.5,
+    "priority": 2
   }
 ]

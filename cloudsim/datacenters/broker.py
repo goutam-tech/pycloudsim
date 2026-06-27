@@ -146,9 +146,11 @@ class DatacenterBroker(SimEntity):
                 continue
 
             assert self._simulation is not None
+            submit_at = max(self._simulation.clock.now(), cloudlet.arrival_time)
+            cloudlet.submit_time = submit_at
             self._simulation.schedule(
                 Event(
-                    time=max(self._simulation.clock.now(), cloudlet.arrival_time),
+                    time=submit_at,
                     event_type=EventType.CLOUDLET_SUBMIT,
                     source=self,
                     destination=dc,
@@ -157,19 +159,24 @@ class DatacenterBroker(SimEntity):
             )
 
     def _handle_cloudlet_complete(self, event: Event) -> None:
-        """Mark a cloudlet as finished and record its finish time."""
+        """Mark a cloudlet as finished and dispatch the next queued cloudlet."""
         cloudlet: "Cloudlet" = event.data
         assert self._simulation is not None
         cloudlet.finish_time = self._simulation.clock.now()
         cloudlet.state = CloudletState.SUCCESS
         self._completed_cloudlets.append(cloudlet)
         logger.info(
-            "[%s] Cloudlet %d completed at %.4f (exec=%.4fs).",
+            "[%s] Cloudlet %d completed at %.4f (exec=%.4fs, wait=%.4fs).",
             self.name,
             cloudlet.cloudlet_id,
             cloudlet.finish_time,
             cloudlet.execution_time,
+            cloudlet.waiting_time,
         )
+
+        dc = self._vm_datacenter_map.get(cloudlet.assigned_vm_id)
+        if dc is not None:
+            dc.on_cloudlet_finished(cloudlet, self)
 
     # ------------------------------------------------------------------
     # Internal helpers

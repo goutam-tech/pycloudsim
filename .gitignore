@@ -12,3 +12,6 @@ wheels/
 pyproject.toml
 uv.lock
 results/
+plan.md
+.cursor
+.pytest_cache/
