@@ -1,0 +1,14 @@
+{
+  "makespan": 46.98306666666667,
+  "throughput": 1.0642132058926193,
+  "total_cloudlets": 50,
+  "completed_cloudlets": 50,
+  "avg_execution_time": 1.8669252833333336,
+  "avg_waiting_time": 8.069038208333337,
+  "avg_response_time": 9.935963491666667,
+  "avg_cpu_utilization": 0.7748274178090692,
+  "total_energy_wh": 2.3491533333333336,
+  "total_cost": 697.2534626416668,
+  "sla_violations": 0,
+  "load_balance_index": 0.0
+}

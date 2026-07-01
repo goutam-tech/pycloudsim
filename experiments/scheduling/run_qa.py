@@ -1,29 +1,21 @@
 """
-Round Robin Scheduling Experiment.
+Quantum Annealing Based Scheduling Experiment.
 
 Run with:
-    python experiments/scheduling/run_round_robin.py
+    python experiments/scheduling/run_qa.py
 """
 
 from __future__ import annotations
+
 import logging
-import sys
 import os
+import sys
 import time
 
-# ---------------------------------------------------------------------------
-# Ensure project root is on sys.path when run directly
-# ---------------------------------------------------------------------------
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-# ---------------------------------------------------------------------------
-# Silence verbose internal logging; use Rich for user-facing output
-# ---------------------------------------------------------------------------
 logging.basicConfig(level=logging.WARNING)
 
-# ---------------------------------------------------------------------------
-# Imports
-# ---------------------------------------------------------------------------
 from cloudsim.core.simulation import Simulation
 from cloudsim.core.constants import DEFAULT_SCHEDULING_INTERVAL
 from cloudsim.cloudlets.task_loader import TaskLoader
@@ -49,9 +41,8 @@ from cloudsim.utils.logger import (
 )
 from rich.panel import Panel
 
-from algorithms.scheduling.round_robin import RoundRobinScheduler
+from algorithms.scheduling.qa import QuantumAnnealingScheduler
 
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -59,19 +50,18 @@ project_root = os.getenv("PROJECT_ROOT")
 hosts_path = os.getenv("HOSTS_PATH")
 vms_path = os.getenv("VMS_PATH")
 cloudlets_path = os.getenv("CLOUDLETS_PATH_25")
-csv_path = os.getenv("CSV_PATH_RR")
-json_path = os.getenv("JSON_PATH_RR")
-plots_path = os.getenv("PLOTS_PATH_RR")
+csv_path = os.getenv("CSV_PATH_QA")
+json_path = os.getenv("JSON_PATH_QA")
+plots_path = os.getenv("PLOTS_PATH_QA")
 
 def run() -> None:
-    """Execute the Round Robin scheduling experiment."""
-    print_banner("PyCloudSim — Round Robin Experiment")
+    """Execute the Quantum Annealing-based scheduling experiment."""
+    print_banner("PyCloudSim — Quantum Annealing Experiment")
     console.print()
 
     with make_progress() as progress:
         task = progress.add_task("[cyan]Setting up simulation…", total=7)
 
-        # 1. Simulation engine
         sim = Simulation()
         progress.advance(task)
 
@@ -94,8 +84,17 @@ def run() -> None:
         sim.add_entity(datacenter)
         progress.advance(task)
 
-        # 3. Scheduler & Broker
-        scheduler = RoundRobinScheduler()
+        scheduler = QuantumAnnealingScheduler(
+            alpha=0.5,
+            beta=0.5,
+            reps=1,
+            batch_size=2,
+            optimizer_name="COBYLA",
+            max_iterations=30,
+            lambda_assign=100.0,
+            lambda_cap=50.0,
+            lambda_invalid=1000.0,
+        )
         broker = DatacenterBroker(name="Broker-1", scheduler=scheduler)
         sim.add_entity(broker)
         broker.add_datacenter(datacenter)
@@ -109,14 +108,12 @@ def run() -> None:
         broker.submit_cloudlet_list(cloudlets)
         progress.advance(task)
 
-        # 6. Run simulation
         progress.update(task, description="[cyan]Running simulation…")
         wall_start = time.perf_counter()
         sim.run()
         wall_elapsed = time.perf_counter() - wall_start
         progress.advance(task)
 
-        # 7. Collect metrics
         progress.update(task, description="[cyan]Computing metrics…")
         collector = MetricsCollector()
         sim_end_time = sim.clock.now()
@@ -132,9 +129,6 @@ def run() -> None:
     success(f"Simulation completed in {wall_elapsed:.3f}s (sim time={sim_end_time:.4f}s)")
     info(f"Events processed: {sim.total_events_processed}")
 
-    # ------------------------------------------------------------------
-    # Validation
-    # ------------------------------------------------------------------
     console.print()
     console.print(Panel("[bold]Validation Checks[/bold]", border_style="blue"))
 
@@ -150,10 +144,11 @@ def run() -> None:
             f"Only {metrics.completed_cloudlets}/{metrics.total_cloudlets} cloudlets completed"
         )
 
-    # Check VM utilisation calculated
     for vm in vms:
         util = vm.average_cpu_utilization()
-        metric(f"VM {vm.vm_id}: avg CPU utilisation = {util*100:.1f}%  |  cloudlets = {len(vm.cloudlets)}")
+        metric(
+            f"VM {vm.vm_id}: avg CPU utilisation = {util*100:.1f}%  |  cloudlets = {len(vm.cloudlets)}"
+        )
 
     if metrics.sla_violations == 0:
         success("No SLA violations ✓")
@@ -161,17 +156,11 @@ def run() -> None:
         from cloudsim.utils.logger import error
         error(f"{metrics.sla_violations} SLA violation(s) detected!")
 
-    # ------------------------------------------------------------------
-    # Display results
-    # ------------------------------------------------------------------
     console.print()
     print_metrics_table(metrics)
     console.print()
     print_cloudlet_table(cloudlets)
 
-    # ------------------------------------------------------------------
-    # Export results
-    # ------------------------------------------------------------------
     console.print()
     info("Exporting results…")
 
@@ -191,10 +180,11 @@ def run() -> None:
     console.print(
         Panel(
             f"[bold green]Experiment complete![/bold green]\n"
-            f"[dim]Results exported to {csv_path}/, {json_path}/, {plots_path}/[/dim]",
+            f"[dim]Results exported to {csv_path}/., {json_path}/, {plots_path}/[/dim]",
             border_style="green",
         )
     )
+
 
 if __name__ == "__main__":
     run()

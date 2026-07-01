@@ -52,21 +52,22 @@ from rich.panel import Panel
 
 from algorithms.scheduling.qaoa import QAOAScheduler
 
+from dotenv import load_dotenv
+load_dotenv()
+
+project_root = os.getenv("PROJECT_ROOT")
+hosts_path = os.getenv("HOSTS_PATH")
+vms_path = os.getenv("VMS_PATH")
+cloudlets_path = os.getenv("CLOUDLETS_PATH_25")
+csv_path = os.getenv("CSV_PATH_QAOA")
+json_path = os.getenv("JSON_PATH_QAOA")
+plots_path = os.getenv("PLOTS_PATH_QAOA")
 
 def run() -> None:
     """Execute the QAOA-based scheduling experiment."""
     print_banner("PyCloudSim — QAOA Experiment")
     console.print()
-
-    # Resolve paths relative to project root to allow execution from any Cwd
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    hosts_path = os.path.join(project_root, "datasets", "hosts", "hosts.json")
-    vms_path = os.path.join(project_root, "datasets", "vms", "vms.json")
-    cloudlets_path = os.path.join(project_root, "datasets", "cloudlets", "cloudlets.json")
-    csv_path = os.path.join(project_root, "results", "csv")
-    json_path = os.path.join(project_root, "results", "json")
-    plots_path = os.path.join(project_root, "results", "plots")
-
+    
     with make_progress() as progress:
         task = progress.add_task("[cyan]Setting up simulation…", total=7)
 
@@ -205,12 +206,11 @@ def run() -> None:
     console.print()
     console.print(
         Panel(
-            "[bold green]Experiment complete![/bold green]\n"
-            "[dim]Results exported to results/csv/, results/json/, results/plots/[/dim]",
+            f"[bold green]Experiment complete![/bold green]\n"
+            f"[dim]Results exported to {csv_path}/, {json_path}/, {plots_path}/[/dim]",
             border_style="green",
         )
     )
-
 
 if __name__ == "__main__":
     run()
