@@ -1,6 +1,6 @@
 """PyCloudSim Cloudlets Package."""
 
 from cloudsim.cloudlets.cloudlet import Cloudlet
-from cloudsim.cloudlets.task_generator import TaskGenerator
+from cloudsim.cloudlets.task_loader import TaskLoader
 
-__all__ = ["Cloudlet", "TaskGenerator"]
+__all__ = ["Cloudlet", "TaskLoader"]

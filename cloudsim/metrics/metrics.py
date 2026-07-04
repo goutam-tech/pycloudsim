@@ -10,8 +10,7 @@ import csv
 import json
 import os
 import logging
-from dataclasses import dataclass, field, asdict
-from pathlib import Path
+from dataclasses import dataclass, asdict
 from typing import List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -34,7 +33,7 @@ class SimulationMetrics:
         total_cloudlets:    Number of cloudlets submitted.
         completed_cloudlets: Number of cloudlets that finished successfully.
         avg_execution_time: Mean cloudlet execution time (s).
-        avg_waiting_time:   Mean cloudlet waiting time (s).
+        avg_waiting_time:   Mean queue wait after submission (start - submit) in seconds.
         avg_response_time:  Mean cloudlet response time (s).
         avg_cpu_utilization: Mean CPU utilisation across all VMs (fraction).
         total_energy_wh:    Estimated total energy in Watt-hours.
@@ -175,14 +174,14 @@ class MetricsCollector:
             writer = csv.writer(f)
             writer.writerow([
                 "id", "state", "vm_id", "length", "pes",
-                "arrival", "start", "finish",
+                "arrival", "submit", "start", "finish",
                 "exec_time", "wait_time", "response_time", "sla_violated",
             ])
             for cl in cloudlets:
                 writer.writerow([
                     cl.cloudlet_id, cl.state, cl.assigned_vm_id,
                     cl.length, cl.pes,
-                    cl.arrival_time, cl.start_time, cl.finish_time,
+                    cl.arrival_time, cl.submit_time, cl.start_time, cl.finish_time,
                     cl.execution_time, cl.waiting_time, cl.response_time,
                     cl.sla_violated,
                 ])
@@ -228,6 +227,7 @@ class MetricsCollector:
                 "length": cl.length,
                 "pes": cl.pes,
                 "arrival_time": cl.arrival_time,
+                "submit_time": cl.submit_time,
                 "start_time": cl.start_time,
                 "finish_time": cl.finish_time,
                 "execution_time": cl.execution_time,

@@ -1,0 +1,13 @@
+metric,value
+makespan,7.996466666666667
+throughput,3.126380818194703
+total_cloudlets,25
+completed_cloudlets,25
+avg_execution_time,1.1291992833333333
+avg_waiting_time,1.8665796333333333
+avg_response_time,2.995778916666666
+avg_cpu_utilization,0.7290029216870006
+total_energy_wh,0.39982333333333336
+total_cost,442.65029982083337
+sla_violations,0
+load_balance_index,0.4

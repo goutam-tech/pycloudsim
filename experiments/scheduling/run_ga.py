@@ -26,16 +26,6 @@ logging.basicConfig(level=logging.WARNING)
 # ---------------------------------------------------------------------------
 from cloudsim.core.simulation import Simulation
 from cloudsim.core.constants import DEFAULT_SCHEDULING_INTERVAL
-
-# from cloudsim.hosts.host import PowerHost
-# from cloudsim.vms.vm import VM
-# from cloudsim.cloudlets.cloudlet import Cloudlet
-# from cloudsim.cloudlets.task_generator import TaskGenerator
-
-import json
-import datasets.cloudlets
-import datasets.hosts
-import datasets.vms
 from cloudsim.cloudlets.task_loader import TaskLoader
 from cloudsim.hosts.host_loader import HostLoader
 from cloudsim.vms.vm_loader import VMLoader
@@ -61,6 +51,17 @@ from rich.panel import Panel
 
 from algorithms.scheduling.genetic_algorithm import GAScheduler
 
+from dotenv import load_dotenv
+load_dotenv()
+
+project_root = os.getenv("PROJECT_ROOT")
+hosts_path = os.getenv("HOSTS_PATH")
+vms_path = os.getenv("VMS_PATH")
+cloudlets_path = os.getenv("CLOUDLETS_PATH_25")
+csv_path = os.getenv("CSV_PATH_GA")
+json_path = os.getenv("JSON_PATH_GA")
+plots_path = os.getenv("PLOTS_PATH_GA")
+
 def run() -> None:
     """Execute the Round Robin scheduling experiment."""
     print_banner("PyCloudSim — Round Robin Experiment")
@@ -75,7 +76,7 @@ def run() -> None:
 
         # 2. Hosts & Datacenter
         hosts = HostLoader.load(
-            "datasets/hosts/hosts.json"
+            hosts_path
         )
         characteristics = DatacenterCharacteristics(
             architecture="x86_64",
@@ -109,14 +110,14 @@ def run() -> None:
 
         # 4. VMs
         vms = VMLoader.load(
-            "datasets/vms/vms.json"
+            vms_path
         )
         broker.submit_vm_list(vms)
         progress.advance(task)
 
         # 5. Cloudlets
         cloudlets = TaskLoader.load(
-            "datasets/cloudlets/cloudlets.json"
+            cloudlets_path
         )
         broker.submit_cloudlet_list(cloudlets)
         progress.advance(task)
@@ -187,27 +188,26 @@ def run() -> None:
     console.print()
     info("Exporting results…")
 
-    collector.export_csv(metrics, cloudlets, path="results/csv")
-    success("CSV results saved to results/csv/")
+    collector.export_csv(metrics, cloudlets, path=csv_path)
+    success(f"CSV results saved to {csv_path}/")
 
-    collector.export_json(metrics, cloudlets, path="results/json")
-    success("JSON results saved to results/json/")
+    collector.export_json(metrics, cloudlets, path=json_path)
+    success(f"JSON results saved to {json_path}/")
 
     try:
-        collector.generate_plots(metrics, cloudlets, vms, path="results/plots")
-        success("Plots saved to results/plots/")
+        collector.generate_plots(metrics, cloudlets, vms, path=plots_path)
+        success(f"Plots saved to {plots_path}/")
     except Exception as exc:
         warning(f"Plot generation skipped: {exc}")
 
     console.print()
     console.print(
         Panel(
-            "[bold green]Experiment complete![/bold green]\n"
-            "[dim]Results exported to results/csv/, results/json/, results/plots/[/dim]",
+            f"[bold green]Experiment complete![/bold green]\n"
+            f"[dim]Results exported to {csv_path}/, {json_path}/, {plots_path}/[/dim]",
             border_style="green",
         )
     )
-
 
 if __name__ == "__main__":
     run()

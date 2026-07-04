@@ -11,4 +11,7 @@ wheels/
 .python-version
 pyproject.toml
 uv.lock
-results/
+plan.md
+.cursor
+.pytest_cache/
+.env
