@@ -52,16 +52,16 @@ from rich.panel import Panel
 from algorithms.scheduling.round_robin import RoundRobinScheduler
 
 import os
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
-project_root = os.getenv("PROJECT_ROOT")
-hosts_path = os.getenv("HOSTS_PATH")
-vms_path = os.getenv("VMS_PATH")
-cloudlets_path = os.getenv("CLOUDLETS_PATH_25")
-csv_path = os.getenv("CSV_PATH_RR")
-json_path = os.getenv("JSON_PATH_RR")
-plots_path = os.getenv("PLOTS_PATH_RR")
+# project_root = os.getenv("PROJECT_ROOT")
+hosts_path = r"D:\pycloudsim\datasets\hosts\hosts.json"
+vms_path = r"D:\pycloudsim\datasets\vms\vms.json"
+cloudlets_path = r"D:\pycloudsim\datasets\cloudlets\cloudlets_25.json"
+csv_path = r"D:\pycloudsim\results\test.csv"
+json_path = r"D:\pycloudsim\results\test.json"
+plots_path = r"D:\pycloudsim\results\test"
 
 def run() -> None:
     """Execute the Round Robin scheduling experiment."""
