@@ -23,27 +23,27 @@ console = Console()
 
 def info(message: str) -> None:
     """Print a blue informational message."""
-    console.print(f"[blue]ℹ  {message}[/blue]")
+    console.print(f"[blue][INFO] {message}[/blue]")
 
 
 def success(message: str) -> None:
     """Print a green success message."""
-    console.print(f"[green]✔  {message}[/green]")
+    console.print(f"[green][OK] {message}[/green]")
 
 
 def warning(message: str) -> None:
     """Print a yellow warning message."""
-    console.print(f"[yellow]⚠  {message}[/yellow]")
+    console.print(f"[yellow][WARN] {message}[/yellow]")
 
 
 def error(message: str) -> None:
     """Print a red error message."""
-    console.print(f"[red]✖  {message}[/red]")
+    console.print(f"[red][ERROR] {message}[/red]")
 
 
 def metric(message: str) -> None:
     """Print a cyan metric message."""
-    console.print(f"[cyan]📊 {message}[/cyan]")
+    console.print(f"[cyan][METRIC] {message}[/cyan]")
 
 
 def print_banner(title: str = "PyCloudSim") -> None:
@@ -157,3 +157,104 @@ def make_progress() -> Progress:
         TimeElapsedColumn(),
         console=console,
     )
+
+
+def print_validation_checks(
+    metrics: "SimulationMetrics",
+    cloudlets: List["Cloudlet"],
+    vms: List | None = None,
+) -> None:
+    """
+    Render Rich-formatted validation checks, matching the image theme.
+
+    Shows cloudlet completion, per-VM CPU utilisation, SLA violations, etc.
+    """
+    from cloudsim.core.constants import CloudletState
+
+    console.print()
+    console.print(Panel("[bold]Validation Checks[/bold]", border_style="blue"))
+
+    # Overall completion
+    all_completed = metrics.completed_cloudlets == metrics.total_cloudlets
+    status = "[green]OK[/green]" if all_completed else "[red]FAIL[/red]"
+    console.print(
+        f"[{status}] All {metrics.total_cloudlets} cloudlets completed [{status}]"
+    )
+
+    # Per-VM CPU utilisation (if VMs provided)
+    if vms:
+        for vm in vms:
+            util = vm.average_cpu_utilization() * 100
+            console.print(
+                f"[METRIC] VM {vm.vm_id}: avg CPU utilisation = {util:.1f}%  |  "
+                f"cloudlets = {len(vm.cloudlets)}"
+            )
+
+    # SLA violations
+    sla_status = (
+        "[green]OK[/green]"
+        if metrics.sla_violations == 0
+        else f"[red]{metrics.sla_violations} violation(s)[/red]"
+    )
+    console.print(f"[dim]No SLA violations [{sla_status}][/dim]")
+
+    console.print()
+
+
+def print_simulation_summary(
+    metrics: "SimulationMetrics",
+    cloudlets: List["Cloudlet"],
+    vms: List | None = None,
+    wall_time: float | None = None,
+    sim_time: float | None = None,
+    events: int | None = None,
+) -> None:
+    """
+    Print a complete, themed simulation summary: banner, metrics table,
+    validation checks, and cloudlet table — all in one call.
+
+    This is the recommended way for users to display results so every
+    simulation gets the same professional Rich output.
+
+    Args:
+        metrics:     The SimulationMetrics from collector.compute().
+        cloudlets:   All cloudlets (for the per-cloudlet table).
+        vms:         Optional VMs (for per-VM utilisation in validation).
+        wall_time:   Optional real elapsed time (s).
+        sim_time:    Optional simulated end time (s).
+        events:      Optional number of events processed.
+    """
+    print_banner("PyCloudSim — Simulation Results")
+
+    if wall_time is not None:
+        info(f"Simulation completed in {wall_time:.3f}s")
+    if sim_time is not None:
+        info(f"Sim time: {sim_time:.4f}s")
+    if events is not None:
+        info(f"Events processed: {events}")
+
+    console.print()
+    print_metrics_table(metrics)
+    console.print()
+
+    print_validation_checks(metrics, cloudlets, vms=vms)
+    console.print()
+
+    print_cloudlet_table(cloudlets)
+
+
+__all__ = [
+    "console",
+    "info",
+    "success",
+    "warning",
+    "error",
+    "metric",
+    "print_banner",
+    "print_metrics_table",
+    "print_cloudlet_table",
+    "make_progress",
+    "print_validation_checks",
+    "print_simulation_summary",
+]
+

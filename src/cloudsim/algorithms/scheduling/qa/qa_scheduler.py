@@ -14,9 +14,9 @@ from typing import List, Optional, TYPE_CHECKING, Any
 from cloudsim.schedulers.schedulers import CloudletScheduler
 from cloudsim.core.constants import CloudletState
 
-from algorithms.scheduling.qa.hamiltonian import build_hamiltonian
-from algorithms.scheduling.qa.decoder import decode_bitstring, repair_assignment
-from algorithms.scheduling.qa.optimizer import get_optimizer
+from cloudsim.algorithms.scheduling.qa.hamiltonian import build_hamiltonian
+from cloudsim.algorithms.scheduling.qa.decoder import decode_bitstring, repair_assignment
+from cloudsim.algorithms.scheduling.qa.optimizer import get_optimizer
 
 if TYPE_CHECKING:
     from cloudsim.cloudlets.cloudlet import Cloudlet
@@ -118,7 +118,7 @@ class QuantumAnnealingScheduler(CloudletScheduler):
 
             # Build Quantum Annealing ansatz without measurement gates for VQE
             from qiskit_algorithms import SamplingVQE
-            from algorithms.scheduling.qa.circuit import build_qa_circuit
+            from cloudsim.algorithms.scheduling.qa.circuit import build_qa_circuit
 
             num_qubits = len(batch) * len(vms)
             ansatz = build_qa_circuit(

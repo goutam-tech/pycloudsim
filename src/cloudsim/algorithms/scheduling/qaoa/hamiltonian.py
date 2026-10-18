@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Dict, Tuple
 from qiskit.quantum_info import SparsePauliOp
 
-from algorithms.scheduling.qaoa.utils import get_qubit_index
+from cloudsim.algorithms.scheduling.qaoa.utils import get_qubit_index
 
 if TYPE_CHECKING:
     from cloudsim.cloudlets.cloudlet import Cloudlet

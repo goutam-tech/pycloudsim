@@ -6,9 +6,10 @@ Run with:
 """
 
 from __future__ import annotations
+
 import logging
-import sys
 import os
+import sys
 import time
 
 # ---------------------------------------------------------------------------
@@ -20,6 +21,18 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 # Silence verbose internal logging; use Rich for user-facing output
 # ---------------------------------------------------------------------------
 logging.basicConfig(level=logging.WARNING)
+
+from dotenv import load_dotenv
+load_dotenv()
+
+
+def _path(env_var: str, default: str) -> str:
+    """Resolve a path from an env var, falling back to a relative default."""
+    val = os.getenv(env_var)
+    if val and os.path.exists(val):
+        return val
+    return default
+
 
 # ---------------------------------------------------------------------------
 # Imports
@@ -37,34 +50,32 @@ from cloudsim.datacenters.characteristics import DatacenterCharacteristics
 from cloudsim.metrics.metrics import MetricsCollector
 
 from cloudsim.utils.logger import (
-    print_banner,
+    console,
+    error,
     info,
+    make_progress,
+    metric,
+    print_banner,
+    print_simulation_summary,
     success,
     warning,
-    metric,
-    print_metrics_table,
-    print_cloudlet_table,
-    make_progress,
-    console,
 )
 from rich.panel import Panel
 
-from algorithms.scheduling.min_min import MinMinScheduler
-
-from dotenv import load_dotenv
-load_dotenv()
+from cloudsim.algorithms.scheduling.min_min import MinMinScheduler
 
 project_root = os.getenv("PROJECT_ROOT")
-hosts_path = os.getenv("HOSTS_PATH")
-vms_path = os.getenv("VMS_PATH")
-cloudlets_path = os.getenv("CLOUDLETS_PATH_25")
-csv_path = os.getenv("CSV_PATH_MM")
-json_path = os.getenv("JSON_PATH_MM")
-plots_path = os.getenv("PLOTS_PATH_MM")
+hosts_path = _path("HOSTS_PATH")
+vms_path = _path("VMS_PATH")
+cloudlets_path = _path("CLOUDLETS_PATH_100")
+csv_path = _path("CSV_PATH_MIN_MIN_100")
+json_path = _path("JSON_PATH_MIN_MIN_100")
+plots_path = _path("PLOTS_PATH_MIN_MIN_100")
+
 
 def run() -> None:
-    """Execute the Round Robin scheduling experiment."""
-    print_banner("PyCloudSim — Round Robin Experiment")
+    """Execute the Min-Min scheduling experiment."""
+    print_banner("PyCloudSim — Min-Min Experiment")
     console.print()
 
     with make_progress() as progress:
@@ -75,9 +86,7 @@ def run() -> None:
         progress.advance(task)
 
         # 2. Hosts & Datacenter
-        hosts = HostLoader.load(
-            hosts_path
-        )
+        hosts = HostLoader.load(hosts_path)
         characteristics = DatacenterCharacteristics(
             architecture="x86_64",
             os="Ubuntu 22.04",
@@ -104,16 +113,12 @@ def run() -> None:
         progress.advance(task)
 
         # 4. VMs
-        vms = VMLoader.load(
-            vms_path
-        )
+        vms = VMLoader.load(vms_path)
         broker.submit_vm_list(vms)
         progress.advance(task)
 
         # 5. Cloudlets
-        cloudlets = TaskLoader.load(
-            cloudlets_path
-        )
+        cloudlets = TaskLoader.load(cloudlets_path)
         broker.submit_cloudlet_list(cloudlets)
         progress.advance(task)
 
@@ -136,46 +141,15 @@ def run() -> None:
         )
         progress.advance(task)
 
-    console.print()
-    success(f"Simulation completed in {wall_elapsed:.3f}s (sim time={sim_end_time:.4f}s)")
-    info(f"Events processed: {sim.total_events_processed}")
-
-    # ------------------------------------------------------------------
-    # Validation
-    # ------------------------------------------------------------------
-    console.print()
-    console.print(Panel("[bold]Validation Checks[/bold]", border_style="blue"))
-
-    if metrics.makespan > 0:
-        success(f"Makespan > 0  ✓  ({metrics.makespan:.4f}s)")
-    else:
-        warning("Makespan is zero — no cloudlets completed!")
-
-    if metrics.completed_cloudlets == metrics.total_cloudlets:
-        success(f"All {metrics.total_cloudlets} cloudlets completed ✓")
-    else:
-        warning(
-            f"Only {metrics.completed_cloudlets}/{metrics.total_cloudlets} cloudlets completed"
-        )
-
-    # Check VM utilisation calculated
-    for vm in vms:
-        util = vm.average_cpu_utilization()
-        metric(f"VM {vm.vm_id}: avg CPU utilisation = {util*100:.1f}%  |  cloudlets = {len(vm.cloudlets)}")
-
-    if metrics.sla_violations == 0:
-        success("No SLA violations ✓")
-    else:
-        from cloudsim.utils.logger import error
-        error(f"{metrics.sla_violations} SLA violation(s) detected!")
-
-    # ------------------------------------------------------------------
-    # Display results
-    # ------------------------------------------------------------------
-    console.print()
-    print_metrics_table(metrics)
-    console.print()
-    print_cloudlet_table(cloudlets)
+    # Themed summary output (banner + metrics table + validation + cloudlet table)
+    print_simulation_summary(
+        metrics=metrics,
+        cloudlets=cloudlets,
+        vms=vms,
+        wall_time=wall_elapsed,
+        sim_time=sim_end_time,
+        events=sim.total_events_processed,
+    )
 
     # ------------------------------------------------------------------
     # Export results

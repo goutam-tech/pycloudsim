@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List
 
-from algorithms.scheduling.qw.utils import get_qubit_index
+from cloudsim.algorithms.scheduling.qw.utils import get_qubit_index
 
 if TYPE_CHECKING:
     from cloudsim.cloudlets.cloudlet import Cloudlet

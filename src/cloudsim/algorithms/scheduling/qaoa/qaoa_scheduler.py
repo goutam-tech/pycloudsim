@@ -13,9 +13,9 @@ from typing import List, Optional, TYPE_CHECKING, Any
 from cloudsim.schedulers.schedulers import CloudletScheduler
 from cloudsim.core.constants import CloudletState
 
-from algorithms.scheduling.qaoa.hamiltonian import build_hamiltonian
-from algorithms.scheduling.qaoa.decoder import decode_bitstring, repair_assignment
-from algorithms.scheduling.qaoa.optimizer import get_optimizer
+from cloudsim.algorithms.scheduling.qaoa.hamiltonian import build_hamiltonian
+from cloudsim.algorithms.scheduling.qaoa.decoder import decode_bitstring, repair_assignment
+from cloudsim.algorithms.scheduling.qaoa.optimizer import get_optimizer
 
 if TYPE_CHECKING:
     from cloudsim.cloudlets.cloudlet import Cloudlet
@@ -118,7 +118,7 @@ class QAOAScheduler(CloudletScheduler):
 
             # Build custom QAOA ansatz without measurement gates for VQE
             from qiskit_algorithms import SamplingVQE
-            from algorithms.scheduling.qaoa.circuit import build_qaoa_circuit
+            from cloudsim.algorithms.scheduling.qaoa.circuit import build_qaoa_circuit
 
             num_qubits = len(batch) * len(vms)
             ansatz = build_qaoa_circuit(

@@ -15,3 +15,8 @@ plan.md
 .pytest_cache/
 .env
 myvenv/
+.venv/
+results/
+.zip
+.vscode
+.vs

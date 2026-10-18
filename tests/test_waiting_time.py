@@ -2,12 +2,7 @@
 
 from __future__ import annotations
 
-import os
-import sys
-
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from cloudsim.cloudlets.cloudlet import Cloudlet
 from cloudsim.cloudlets.task_loader import TaskLoader
@@ -19,7 +14,7 @@ from cloudsim.datacenters.datacenter import Datacenter
 from cloudsim.hosts.host_loader import HostLoader
 from cloudsim.metrics.metrics import MetricsCollector
 from cloudsim.vms.vm_loader import VMLoader
-from algorithms.scheduling.round_robin import RoundRobinScheduler
+from cloudsim.algorithms.scheduling.round_robin import RoundRobinScheduler
 
 
 def _run_simulation(cloudlet_path: str) -> tuple[list[Cloudlet], object]:
@@ -66,7 +61,7 @@ def test_waiting_time_property_uses_submit_time() -> None:
 
 
 def test_simulation_reports_nonzero_avg_waiting_time() -> None:
-    cloudlets, metrics = _run_simulation("datasets/cloudlets/cloudlets.json")
+    cloudlets, metrics = _run_simulation("datasets/cloudlets/cloudlets_25.json")
 
     assert metrics.completed_cloudlets == len(cloudlets)
     assert metrics.avg_waiting_time > 0.0
@@ -76,7 +71,7 @@ def test_simulation_reports_nonzero_avg_waiting_time() -> None:
 
 
 def test_first_cloudlet_on_idle_vm_has_zero_wait() -> None:
-    cloudlets, _ = _run_simulation("datasets/cloudlets/cloudlets.json")
+    cloudlets, _ = _run_simulation("datasets/cloudlets/cloudlets_25.json")
     first_on_vm = {}
     for cloudlet in sorted(cloudlets, key=lambda cl: (cl.assigned_vm_id, cl.start_time)):
         if cloudlet.assigned_vm_id not in first_on_vm:

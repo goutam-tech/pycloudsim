@@ -13,9 +13,9 @@ from typing import List, Optional, TYPE_CHECKING, Any
 from cloudsim.schedulers.schedulers import CloudletScheduler
 from cloudsim.core.constants import CloudletState
 
-from algorithms.scheduling.qw.hamiltonian import build_hamiltonian
-from algorithms.scheduling.qw.decoder import decode_bitstring, repair_assignment
-from algorithms.scheduling.qw.optimizer import get_optimizer
+from cloudsim.algorithms.scheduling.qw.hamiltonian import build_hamiltonian
+from cloudsim.algorithms.scheduling.qw.decoder import decode_bitstring, repair_assignment
+from cloudsim.algorithms.scheduling.qw.optimizer import get_optimizer
 
 if TYPE_CHECKING:
     from cloudsim.cloudlets.cloudlet import Cloudlet
@@ -117,7 +117,7 @@ class QuantumWalkScheduler(CloudletScheduler):
 
             # Build Quantum Walk ansatz without measurement gates for VQE
             from qiskit_algorithms import SamplingVQE
-            from algorithms.scheduling.qw.circuit import build_qw_circuit
+            from cloudsim.algorithms.scheduling.qw.circuit import build_qw_circuit
 
             num_qubits = len(batch) * len(vms)
             ansatz = build_qw_circuit(

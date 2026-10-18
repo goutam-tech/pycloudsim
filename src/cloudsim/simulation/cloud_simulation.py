@@ -40,6 +40,7 @@ class CloudSimulation:
         vms: str | Path,
         cloudlets: str | Path,
         scheduler,
+        characteristics: DatacenterCharacteristics | None = None,
     ) -> "CloudSimulation":
         """Create a simulation from JSON dataset files."""
 
@@ -47,15 +48,16 @@ class CloudSimulation:
 
         hosts_data = HostLoader.load(str(hosts))
 
-        characteristics = DatacenterCharacteristics(
-            architecture="x86_64",
-            os="Ubuntu 22.04",
-            vmm="KVM",
-            cost_per_second=0.01,
-            cost_per_mem=0.002,
-            cost_per_storage=0.0001,
-            cost_per_bw=0.0005,
-        )
+        if characteristics is None:
+            characteristics = DatacenterCharacteristics(
+                architecture="x86_64",
+                os="Ubuntu 22.04",
+                vmm="KVM",
+                cost_per_second=0.01,
+                cost_per_mem=0.002,
+                cost_per_storage=0.0001,
+                cost_per_bw=0.0005,
+            )
 
         datacenter = Datacenter(
             name="DC-1",
